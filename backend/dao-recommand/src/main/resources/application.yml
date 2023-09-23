@@ -5,7 +5,7 @@ spring:
   datasource:
     username: root
     password: 123456
-    url: jdbc:mysql://localhost:3306/bfit?useUnicode=true&characterEncoding=utf-8
+    url: jdbc:mysql://124.223.105.57:3306/bfit?useUnicode=true&characterEncoding=utf-8
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       # 连接池最大连接数
@@ -18,5 +18,9 @@ spring:
       connection-timeout: 20000
       # 测试sql
       connection-test-query: select 1
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
 server:
   port: 8883

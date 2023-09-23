@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
+import java.util.Objects;
 
 @Repository
 @RequiredArgsConstructor
@@ -34,6 +35,13 @@ public class UserInfoRepository extends ServiceImpl<UserInfoMapper, UserInfo> im
         }
 
         return saveBatch(entityList);
+    }
+
+    public Boolean saveOne(UserInfo entity){
+        if (Objects.isNull(entity)){
+            return false;
+        }
+        return userInfoMapper.insert(entity) == 1;
     }
 
 }

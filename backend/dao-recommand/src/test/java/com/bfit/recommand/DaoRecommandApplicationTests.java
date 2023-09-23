@@ -170,7 +170,7 @@ class DaoRecommandApplicationTests {
     @Test
     void testExistIndex() {
         //1.查询索引请求
-        GetIndexRequest request=new GetIndexRequest("user_info");
+        GetIndexRequest request=new GetIndexRequest("project_info");
         //2.执行exists方法判断是否存在
         boolean exists=restHighLevelClient.indices().exists(request,RequestOptions.DEFAULT);
         System.out.println(exists);

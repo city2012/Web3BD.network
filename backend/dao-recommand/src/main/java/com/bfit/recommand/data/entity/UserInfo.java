@@ -18,6 +18,7 @@ public class UserInfo {
     private String userName;
     private String userWallet;
     private String avatar;
+    private String userEmail;
     private Date dbCreateTime;
     private Date dbUpdateTime;
     @TableLogic(value = "0")
