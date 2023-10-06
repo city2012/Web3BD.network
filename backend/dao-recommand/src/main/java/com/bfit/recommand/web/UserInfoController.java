@@ -15,6 +15,7 @@ public class UserInfoController {
 
     private final UserInfoService userInfoService;
 
+    @CrossOrigin
     @PostMapping("/email/registration")
     public CommonResult<Boolean> fetchRecommandNeeds(@RequestBody @Validated UserEmailInfoDto userEmailInfoDto){
         return CommonResult.ok(userInfoService.registerEmail(userEmailInfoDto.getEmail(), userEmailInfoDto.getWalletAddress()));
