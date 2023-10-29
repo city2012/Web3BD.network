@@ -53,6 +53,12 @@ public class ProjectInfoRepository {
                 .list();
     }
 
+    public boolean saveOne(ProjectInfo entity){
+        if (Objects.isNull(entity)){
+            return false;
+        }
+        return projectInfoMapper.insert(entity) > 0;
+    }
 
 
 

@@ -4,10 +4,13 @@ import com.bfit.recommand.common.dto.CommonResult;
 import com.bfit.recommand.service.NeedsService;
 import com.bfit.recommand.web.dto.HomeNeedsDto;
 import com.bfit.recommand.web.dto.PersonalNeedsDto;
+import com.bfit.recommand.web.dto.request.PublishNeedsRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RequiredArgsConstructor
 @RestController("needs")
@@ -39,6 +42,17 @@ public class NeedsController {
     public CommonResult<List<PersonalNeedsDto>> getUserNeeds(@RequestParam String userWallet,
                                                              @RequestParam Integer relationType){
         return CommonResult.ok(needsService.getUserNeeds(userWallet, relationType));
+    }
+
+    @CrossOrigin
+    @PostMapping("/publish_needs")
+    public CommonResult<Boolean> publishNeeds(@RequestBody @Validated PublishNeedsRequest request){
+
+        if (Objects.isNull(request)){
+            return CommonResult.ok(false);
+        }
+
+        return CommonResult.ok(needsService.publishNeeds(request));
     }
 
     @CrossOrigin

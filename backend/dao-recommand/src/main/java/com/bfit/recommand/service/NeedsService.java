@@ -1,6 +1,7 @@
 package com.bfit.recommand.service;
 
 import com.bfit.recommand.common.OrderStatusEnum;
+import com.bfit.recommand.common.util.RandomUtils;
 import com.bfit.recommand.data.entity.InstanceMessage;
 import com.bfit.recommand.data.entity.ProjectInfo;
 import com.bfit.recommand.data.entity.UserInfo;
@@ -11,6 +12,7 @@ import com.bfit.recommand.repo.UserInfoRepository;
 import com.bfit.recommand.repo.UserProjectRepository;
 import com.bfit.recommand.web.dto.HomeNeedsDto;
 import com.bfit.recommand.web.dto.PersonalNeedsDto;
+import com.bfit.recommand.web.dto.request.PublishNeedsRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -136,6 +138,35 @@ public class NeedsService {
         }
     }
 
+    public Boolean publishNeeds(PublishNeedsRequest request){
+
+        ProjectInfo projectInfo = ProjectInfo.builder()
+                .projectName(request.getTitle())
+                .description(request.getDescription())
+                .projectAsset(request.getCrypto())
+                .projectPrice(request.getReward())
+                .projectStatus(OrderStatusEnum.INIT.getCode())
+                .projectType(request.getType())
+                .expireTime(request.getEndTime())
+                .startTime(request.getStartTime())
+                .issuerAddress(request.getUserWallet())
+                .build();
+
+        boolean projectInitedFlag = projectInfoRepository.saveOne(projectInfo);
+        if (projectInitedFlag
+                && !userInfoRepository.existUser(request.getUserWallet())){
+
+            String userName = "Biz-" + RandomUtils.generateRandomString();
+            UserInfo userInfo = UserInfo.builder()
+                    .userWallet(request.getUserWallet())
+                    .userName(userName)
+                    .userEmail(userName + "@biz.com")
+                    .build();
+            return userInfoRepository.saveOne(userInfo);
+        }
+        return projectInitedFlag;
+    }
+
 //    public List<Object> getRelatedNeeds(){
 //
 //        return CommonResult.ok();
@@ -164,6 +195,7 @@ public class NeedsService {
 //    public Boolean finalConfirmNeeds(){
 //        return CommonResult.ok(true);
 //    }
+
 
 
 }

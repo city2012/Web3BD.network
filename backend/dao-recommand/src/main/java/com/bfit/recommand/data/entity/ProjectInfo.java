@@ -3,6 +3,7 @@ package com.bfit.recommand.data.entity;
 import com.baomidou.mybatisplus.annotation.TableLogic;
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import lombok.Builder;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -11,6 +12,7 @@ import java.util.Date;
 
 @Data
 @TableName("project_info")
+@Builder
 public class ProjectInfo implements Serializable {
 
     /**
@@ -28,12 +30,16 @@ public class ProjectInfo implements Serializable {
     private Long id;
     private String issuerAddress;
     private String projectAddress;
+
     private String projectName;
     private String description;
     private Integer projectStatus;
     private String projectTag;
     private BigDecimal projectPrice;
     private String projectAsset;
+    private String projectType;
+
+    private Date startTime;
     private Date expireTime;
     @JsonIgnore
     private Date dbCreateTime;

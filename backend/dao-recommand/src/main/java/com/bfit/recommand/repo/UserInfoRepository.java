@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bfit.recommand.data.entity.UserInfo;
 import com.bfit.recommand.data.mapper.UserInfoMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Repository;
 import org.springframework.util.CollectionUtils;
 
@@ -19,6 +20,18 @@ public class UserInfoRepository extends ServiceImpl<UserInfoMapper, UserInfo> im
 
     public List<UserInfo> queryAll() {
         return new LambdaQueryChainWrapper<>(userInfoMapper).list();
+    }
+
+    public boolean existUser(String userWallet){
+
+        if (StringUtils.isBlank(userWallet)){
+            return false;
+        }
+
+        return Objects.nonNull(new LambdaQueryChainWrapper<>(userInfoMapper)
+                .eq(UserInfo::getUserWallet, userWallet)
+                .last("limit 1")
+                .one());
     }
 
     public List<UserInfo> queryByUserWalletList(List<String> userWalletList) {
