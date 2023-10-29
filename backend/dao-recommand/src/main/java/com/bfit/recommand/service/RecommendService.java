@@ -39,7 +39,7 @@ public class RecommendService {
 
         List<ProjectInfo> projectInfos = fuzzyQuery(item);
         if (null == projectInfos || projectInfos.isEmpty()){
-            projectInfos = projectInfoRepository.queryRecentByIssuer(walletAddress);
+            projectInfos = projectInfoRepository.queryRecentListByIssuer(walletAddress);
         }
 
         if (null == projectInfos || projectInfos.isEmpty()){

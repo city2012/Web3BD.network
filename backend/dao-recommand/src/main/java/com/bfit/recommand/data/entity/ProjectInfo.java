@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Data
@@ -27,7 +28,12 @@ public class ProjectInfo implements Serializable {
     private Long id;
     private String issuerAddress;
     private String projectAddress;
+    private String projectName;
     private String description;
+    private Integer projectStatus;
+    private String projectTag;
+    private BigDecimal projectPrice;
+    private String projectAsset;
     private Date expireTime;
     @JsonIgnore
     private Date dbCreateTime;

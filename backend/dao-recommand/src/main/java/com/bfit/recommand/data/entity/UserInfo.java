@@ -19,6 +19,7 @@ public class UserInfo {
     private String userWallet;
     private String avatar;
     private String userEmail;
+    private String socialLinks;
     private Date dbCreateTime;
     private Date dbUpdateTime;
     @TableLogic(value = "0")

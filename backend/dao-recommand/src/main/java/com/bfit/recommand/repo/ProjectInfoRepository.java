@@ -24,11 +24,14 @@ public class ProjectInfoRepository {
                 .last("limit 1").one();
     }
 
-    public List<ProjectInfo> queryRecentByIssuer(String issuerAddress){
+    public List<ProjectInfo> queryRecentListByIssuer(String issuerAddress){
         return new LambdaQueryChainWrapper<>(projectInfoMapper)
                 .ne(ProjectInfo::getIssuerAddress, issuerAddress)
                 .orderByDesc(ProjectInfo::getDbCreateTime)
                 .list();
     }
+
+
+
 
 }
