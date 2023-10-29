@@ -4,6 +4,8 @@ import java.security.SecureRandom;
 
 public class RandomUtils {
 
+    private final static SnowflakeIdGenerator idGenerator = new SnowflakeIdGenerator(1, 1);
+
     public static String generateRandomString() {
         String characters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         StringBuilder sb = new StringBuilder(5);
@@ -16,6 +18,15 @@ public class RandomUtils {
         }
 
         return sb.toString();
+    }
+
+    public static String genSnowflakeWithSuffix(String suffix){
+        return suffix + generateRandomString();
+    }
+
+    public static Long generateSnowflake(){
+        // 生成唯一ID
+        return idGenerator.generateId();
     }
 
 }

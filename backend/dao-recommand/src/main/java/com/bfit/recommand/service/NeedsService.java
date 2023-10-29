@@ -2,6 +2,7 @@ package com.bfit.recommand.service;
 
 import com.bfit.recommand.common.OrderStatusEnum;
 import com.bfit.recommand.common.util.RandomUtils;
+import com.bfit.recommand.common.util.SnowflakeIdGenerator;
 import com.bfit.recommand.data.entity.InstanceMessage;
 import com.bfit.recommand.data.entity.ProjectInfo;
 import com.bfit.recommand.data.entity.UserInfo;
@@ -150,6 +151,7 @@ public class NeedsService {
                 .expireTime(request.getEndTime())
                 .startTime(request.getStartTime())
                 .issuerAddress(request.getUserWallet())
+                .projectAddress(RandomUtils.genSnowflakeWithSuffix("0x"))
                 .build();
 
         boolean projectInitedFlag = projectInfoRepository.saveOne(projectInfo);
