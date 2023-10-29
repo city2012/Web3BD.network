@@ -2,6 +2,8 @@ package com.bfit.recommand.web;
 
 import com.bfit.recommand.common.dto.CommonResult;
 import com.bfit.recommand.service.NeedsService;
+import com.bfit.recommand.web.dto.HomeNeedsDto;
+import com.bfit.recommand.web.dto.PersonalNeedsDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,14 +30,15 @@ public class NeedsController {
 
     @CrossOrigin
     @GetMapping("/public_needs")
-    public CommonResult<List<Object>> getPublicNeeds(){
+    public CommonResult<List<HomeNeedsDto>> getPublicNeeds(){
         return CommonResult.ok(needsService.getPublicNeeds());
     }
 
     @CrossOrigin
     @GetMapping("/my_needs")
-    public CommonResult<List<Object>> getUserNeeds(@RequestParam String userWallet){
-        return CommonResult.ok(needsService.getUserNeeds(userWallet));
+    public CommonResult<List<PersonalNeedsDto>> getUserNeeds(@RequestParam String userWallet,
+                                                             @RequestParam Integer relationType){
+        return CommonResult.ok(needsService.getUserNeeds(userWallet, relationType));
     }
 
     @CrossOrigin

@@ -1,19 +1,26 @@
 package com.bfit.recommand.service;
 
-import com.bfit.recommand.common.dto.CommonResult;
+import com.bfit.recommand.common.OrderStatusEnum;
+import com.bfit.recommand.data.entity.InstanceMessage;
 import com.bfit.recommand.data.entity.ProjectInfo;
 import com.bfit.recommand.data.entity.UserInfo;
 import com.bfit.recommand.data.entity.UserProject;
+import com.bfit.recommand.repo.InstanceMessageRepository;
 import com.bfit.recommand.repo.ProjectInfoRepository;
 import com.bfit.recommand.repo.UserInfoRepository;
+import com.bfit.recommand.repo.UserProjectRepository;
 import com.bfit.recommand.web.dto.HomeNeedsDto;
+import com.bfit.recommand.web.dto.PersonalNeedsDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static com.bfit.recommand.common.RelationTypeEnum.*;
 
 @Slf4j
 @Service
@@ -22,6 +29,8 @@ public class NeedsService {
 
     private final ProjectInfoRepository projectInfoRepository;
     private final UserInfoRepository userInfoRepository;
+    private final UserProjectRepository userProjectRepository;
+    private final InstanceMessageRepository instanceMessageRepository;
 
     public List<HomeNeedsDto> getPublicNeeds(){
 
@@ -38,7 +47,10 @@ public class NeedsService {
                 return null;
             }
 
-            return HomeNeedsDto.builder().needsName(x.getProjectName())
+            return HomeNeedsDto.builder()
+                    .crypto(x.getProjectAsset())
+                    .reward(x.getProjectPrice())
+                    .needsName(x.getProjectName())
                     .avatar(userInfo.getAvatar())
                     .organizationName(userInfo.getUserName())
                     .description(x.getDescription())
@@ -51,13 +63,20 @@ public class NeedsService {
         }).collect(Collectors.toList());
     }
 
-    public List<HomeNeedsDto> getUserNeeds(String userWallet){
+    public List<PersonalNeedsDto> getUserNeeds(String userWallet, Integer relationType){
 
-        List<ProjectInfo> projectInfoList = projectInfoRepository.queryRecentListByIssuer(userWallet);
-        if (null == projectInfoList || projectInfoList.size() == 0){
+        List<ProjectInfo> projectInfoList = fetchUserProjectListByRelation(userWallet, relationType);
+        if (CollectionUtils.isEmpty(projectInfoList)){
             return Collections.emptyList();
         }
         List<UserInfo> userInfos = userInfoRepository.queryByUserWalletList(Collections.singletonList(userWallet));
+        List<InstanceMessage> instanceMessages =
+                instanceMessageRepository.queryListByProjectAddressList(projectInfoList.stream().map(ProjectInfo::getProjectAddress).collect(Collectors.toList()));
+        List<String> reviewerList = instanceMessages.stream().map(InstanceMessage::getReviewerAddress).collect(Collectors.toList());
+        List<UserInfo> imUserInfos = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(reviewerList)){
+            imUserInfos.addAll(userInfoRepository.queryByUserWalletList(reviewerList.stream().distinct().collect(Collectors.toList())));
+        }
 
         return projectInfoList.stream().map(x -> {
 
@@ -66,17 +85,55 @@ public class NeedsService {
                 return null;
             }
 
-            return HomeNeedsDto.builder().needsName(x.getProjectName())
+            return PersonalNeedsDto.builder().needsName(x.getProjectName())
                     .avatar(userInfo.getAvatar())
                     .organizationName(userInfo.getUserName())
                     .description(x.getDescription())
                     .projectStatus(String.valueOf(x.getProjectStatus()))
                     .projectTag(x.getProjectTag())
+                    .messageList(fetchMessageInfos(instanceMessages, imUserInfos, x.getProjectAddress()))
+                    .crypto(x.getProjectAsset())
+                    .reward(x.getProjectPrice())
                     .createTime(x.getDbCreateTime())
                     .lastModifyTime(x.getDbUpdateTime())
                     .build();
-
         }).collect(Collectors.toList());
+    }
+
+    @NotNull
+    private List<PersonalNeedsDto.MessageDto> fetchMessageInfos(List<InstanceMessage> totalMessageList, List<UserInfo> imUserInfos, String projectAddress) {
+        if (CollectionUtils.isEmpty(totalMessageList)){
+            return Collections.emptyList();
+        }
+        List<InstanceMessage> messageList = totalMessageList.stream().filter(e -> e.getProjectAddress().equals(projectAddress)).collect(Collectors.toList());
+
+        return messageList.stream().map(e -> {
+                            UserInfo imUser = imUserInfos.stream().filter(s -> e.getReviewerAddress().equals(s.getUserWallet())).findFirst().orElse(null);
+                            return PersonalNeedsDto.MessageDto.builder()
+                                    .message(e.getMessage())
+                                    .name(imUser == null ? e.getReviewerAddress() : imUser.getUserName())
+                                    .createTime(e.getDbCreateTime())
+                                    .build();
+                        }
+                )
+                .collect(Collectors.toList());
+    }
+
+    private List<ProjectInfo> fetchUserProjectListByRelation(String userWallet, Integer relationType){
+        switch (fetchByCode(relationType)){
+            case POST:
+                return projectInfoRepository.queryListByIssuer(userWallet);
+            case JOIN:{
+                List<UserProject> userProjects = userProjectRepository.queryListByReviewerList(Collections.singletonList(userWallet));
+                return projectInfoRepository.queryListByProjectAddressList(userProjects.stream().map(UserProject::getProjectAddress).collect(Collectors.toList()), OrderStatusEnum.APPLIED.getCode());
+            }
+            case RELATED: {
+                List<UserProject> userProjects = userProjectRepository.queryListByReviewerList(Collections.singletonList(userWallet));
+                return projectInfoRepository.queryListByProjectAddressList(userProjects.stream().map(UserProject::getProjectAddress).collect(Collectors.toList()), null);
+            }
+            default:
+                return null;
+        }
     }
 
 //    public List<Object> getRelatedNeeds(){

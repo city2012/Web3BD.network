@@ -5,9 +5,10 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.bfit.recommand.data.entity.UserProject;
 import com.bfit.recommand.data.mapper.UserProjectMapper;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Repository;
-import org.springframework.util.CollectionUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -39,6 +40,16 @@ public class UserProjectRepository extends ServiceImpl<UserProjectMapper, UserPr
 
     public List<UserProject> selectAll(){
         return new LambdaQueryChainWrapper<>(userProjectMapper).list();
+    }
+
+    public List<UserProject> queryListByReviewerList(List<String> reviewerAddressList){
+
+        if (CollectionUtils.isEmpty(reviewerAddressList)){
+            return Collections.emptyList();
+        }
+        return new LambdaQueryChainWrapper<>(userProjectMapper)
+                .in(UserProject::getReviewerAddress, reviewerAddressList)
+                .list();
     }
 
 }

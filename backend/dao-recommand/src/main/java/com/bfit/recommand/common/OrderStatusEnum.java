@@ -9,13 +9,14 @@ public enum OrderStatusEnum {
 
     INIT(0, "INIT"),
     POSTED(1, "POSTED"),
-    ACCEPTED(2, "ACCEPTED"),
-    PROCESSING(3,"PROCESSING"),
-    COMPLETED(4, "COMPLETED"),
+    APPLIED(2, "APPLIED"),
+    ACCEPTED(3, "ACCEPTED"),
+    PROCESSING(4,"PROCESSING"),
+    COMPLETED(5, "COMPLETED"),
     FINAL_CONFIRMED(9, "FINAL_CONFIRMED")
 
     ;
-    int code;
+    Integer code;
     String status;
 
 
