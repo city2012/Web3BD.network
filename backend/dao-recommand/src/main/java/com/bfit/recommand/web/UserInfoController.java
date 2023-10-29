@@ -4,6 +4,7 @@ import com.bfit.recommand.common.dto.CommonResult;
 import com.bfit.recommand.service.UserInfoService;
 import com.bfit.recommand.web.dto.UserEmailInfoDto;
 import com.bfit.recommand.web.dto.UserInfoDto;
+import com.bfit.recommand.web.dto.request.UserRegisterRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -32,6 +33,12 @@ public class UserInfoController {
     @GetMapping("/person")
     public CommonResult<UserInfoDto> fetchPersonInfo(@RequestParam("addr") String walletAddress){
         return CommonResult.ok(userInfoService.fetchUserInfo(walletAddress));
+    }
+
+    @CrossOrigin
+    @PostMapping("/registration")
+    public CommonResult<Boolean> register(@RequestBody @Validated UserRegisterRequest request){
+        return CommonResult.ok(userInfoService.register(request));
     }
 
 }

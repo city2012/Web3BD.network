@@ -15,14 +15,25 @@ public class UserInfo {
 
     @TableId
     private Long id;
+    private Long organizationId;
+    private Integer level;
     private String userName;
     private String userWallet;
     private String avatar;
     private String userEmail;
     private String socialLinks;
+    private String description;
+    private String other;
     private Date dbCreateTime;
     private Date dbUpdateTime;
     @TableLogic(value = "0")
     private boolean deleted;
+
+    @Data
+    @Builder
+    public static class SocialLinkDto{
+        private String name;
+        private String link;
+    }
 
 }

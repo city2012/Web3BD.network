@@ -1,5 +1,6 @@
 package com.bfit.recommand.web.dto;
 
+import com.bfit.recommand.data.entity.UserInfo;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,16 +14,7 @@ public class UserInfoDto {
     private String userWallet;
     private String avatar;
     private String userEmail;
-    private List<SocilLinks> socialLinkList;
+    private List<UserInfo.SocialLinkDto> socialLinkList;
     private Integer noticeNum;
-
-    @Data
-    @Builder
-    public static class SocilLinks{
-
-        private String name;
-        private String link;
-
-    }
 
 }
