@@ -57,4 +57,11 @@ public class UserInfoRepository extends ServiceImpl<UserInfoMapper, UserInfo> im
         return userInfoMapper.insert(entity) == 1;
     }
 
+    public List<UserInfo> queryExceptUser(String walletAddress, Integer orgLevel) {
+        return new LambdaQueryChainWrapper<>(userInfoMapper)
+                .eq(StringUtils.isNotBlank(walletAddress),UserInfo::getUserWallet,walletAddress)
+                .eq(UserInfo::getLevel, orgLevel)
+                .list();
+    }
+
 }

@@ -1,7 +1,7 @@
 package com.bfit.recommand.data.entity;
 
-import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableLogic;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,17 +9,18 @@ import java.util.Date;
 
 @Data
 @Builder
-public class InstanceMessage {
+public class ApplicationInfo {
 
-    @TableId
     private Long id;
-    private String userAddress;
+    private String reviewerAddress;
     private String projectAddress;
-    private Long applicationId;
-    private String message;
+    private Long projectId;
+    private Integer applicationStatus;
+    @JsonIgnore
     private Date dbCreateTime;
+    @JsonIgnore
     private Date dbUpdateTime;
-    @TableLogic(delval = "0")
+    @TableLogic(value = "0")
     private Boolean deleted;
 
 }

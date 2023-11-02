@@ -10,12 +10,14 @@ import com.bfit.recommand.web.dto.request.UserRegisterRequest;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -86,4 +88,20 @@ public class UserInfoService {
         return userInfoRepository.saveOne(userInfo);
     }
 
+    public List<UserInfoDto> fetchOrganizationList(String walletAddress) {
+
+        List<UserInfo> userInfos = userInfoRepository.queryExceptUser(walletAddress, OrgLevelEnum.ORGANIZATION.getCode());
+        if (CollectionUtils.isEmpty(userInfos)){
+            return Collections.emptyList();
+        }
+        return userInfos.stream().map(x->{
+            return UserInfoDto.builder()
+                    .userEmail(x.getUserEmail())
+                    .userName(x.getUserName())
+                    .avatar(x.getAvatar())
+                    .userWallet(x.getUserWallet())
+                    .socialLinkList(JsonUtils.toList(x.getSocialLinks(), new TypeReference<List<UserInfo.SocialLinkDto>>() {}))
+                    .build();
+        }).collect(Collectors.toList());
+    }
 }

@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 
 @RequiredArgsConstructor
 @RestController("user")
@@ -39,6 +41,12 @@ public class UserInfoController {
     @PostMapping("/registration")
     public CommonResult<Boolean> register(@RequestBody @Validated UserRegisterRequest request){
         return CommonResult.ok(userInfoService.register(request));
+    }
+
+    @CrossOrigin
+    @GetMapping("/organization/list")
+    public CommonResult<List<UserInfoDto>> fetchOrganizationInfoList(@RequestParam(name = "exceptAddr", required = false) String walletAddress){
+        return CommonResult.ok(userInfoService.fetchOrganizationList(walletAddress));
     }
 
 }

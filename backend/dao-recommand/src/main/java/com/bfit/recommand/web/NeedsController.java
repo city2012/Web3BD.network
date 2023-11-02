@@ -3,6 +3,7 @@ package com.bfit.recommand.web;
 import com.bfit.recommand.common.dto.CommonResult;
 import com.bfit.recommand.service.NeedsService;
 import com.bfit.recommand.web.dto.HomeNeedsDto;
+import com.bfit.recommand.web.dto.NeedsApplicationDetailsDto;
 import com.bfit.recommand.web.dto.PersonalNeedsDto;
 import com.bfit.recommand.web.dto.request.PublishNeedsRequest;
 import lombok.RequiredArgsConstructor;
@@ -42,6 +43,12 @@ public class NeedsController {
     public CommonResult<List<PersonalNeedsDto>> getUserNeeds(@RequestParam String userWallet,
                                                              @RequestParam Integer relationType){
         return CommonResult.ok(needsService.getUserNeeds(userWallet, relationType));
+    }
+
+    @CrossOrigin
+    @GetMapping("/my_needs/application/list")
+    public CommonResult<List<NeedsApplicationDetailsDto>> getUserNeedsAppList(@RequestParam String projectId){
+        return CommonResult.ok(needsService.getNeedsAppList(projectId));
     }
 
     @CrossOrigin

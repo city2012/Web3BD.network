@@ -3,15 +3,10 @@ package com.bfit.recommand.service;
 import com.bfit.recommand.common.OrderStatusEnum;
 import com.bfit.recommand.common.util.RandomUtils;
 import com.bfit.recommand.common.util.SnowflakeIdGenerator;
-import com.bfit.recommand.data.entity.InstanceMessage;
-import com.bfit.recommand.data.entity.ProjectInfo;
-import com.bfit.recommand.data.entity.UserInfo;
-import com.bfit.recommand.data.entity.UserProject;
-import com.bfit.recommand.repo.InstanceMessageRepository;
-import com.bfit.recommand.repo.ProjectInfoRepository;
-import com.bfit.recommand.repo.UserInfoRepository;
-import com.bfit.recommand.repo.UserProjectRepository;
+import com.bfit.recommand.data.entity.*;
+import com.bfit.recommand.repo.*;
 import com.bfit.recommand.web.dto.HomeNeedsDto;
+import com.bfit.recommand.web.dto.NeedsApplicationDetailsDto;
 import com.bfit.recommand.web.dto.PersonalNeedsDto;
 import com.bfit.recommand.web.dto.request.PublishNeedsRequest;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.bfit.recommand.common.RelationTypeEnum.*;
 
@@ -34,6 +30,7 @@ public class NeedsService {
     private final UserInfoRepository userInfoRepository;
     private final UserProjectRepository userProjectRepository;
     private final InstanceMessageRepository instanceMessageRepository;
+    private final ApplicationInfoRepo applicationInfoRepo;
 
     public List<HomeNeedsDto> getPublicNeeds(){
 
@@ -75,7 +72,7 @@ public class NeedsService {
         List<UserInfo> userInfos = userInfoRepository.queryByUserWalletList(Collections.singletonList(userWallet));
         List<InstanceMessage> instanceMessages =
                 instanceMessageRepository.queryListByProjectAddressList(projectInfoList.stream().map(ProjectInfo::getProjectAddress).collect(Collectors.toList()));
-        List<String> reviewerList = instanceMessages.stream().map(InstanceMessage::getReviewerAddress).collect(Collectors.toList());
+        List<String> reviewerList = instanceMessages.stream().map(InstanceMessage::getUserAddress).collect(Collectors.toList());
         List<UserInfo> imUserInfos = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(reviewerList)){
             imUserInfos.addAll(userInfoRepository.queryByUserWalletList(reviewerList.stream().distinct().collect(Collectors.toList())));
@@ -111,10 +108,10 @@ public class NeedsService {
         List<InstanceMessage> messageList = totalMessageList.stream().filter(e -> e.getProjectAddress().equals(projectAddress)).collect(Collectors.toList());
 
         return messageList.stream().map(e -> {
-                            UserInfo imUser = imUserInfos.stream().filter(s -> e.getReviewerAddress().equals(s.getUserWallet())).findFirst().orElse(null);
+                            UserInfo imUser = imUserInfos.stream().filter(s -> e.getUserAddress().equals(s.getUserWallet())).findFirst().orElse(null);
                             return PersonalNeedsDto.MessageDto.builder()
                                     .message(e.getMessage())
-                                    .name(imUser == null ? e.getReviewerAddress() : imUser.getUserName())
+                                    .name(imUser == null ? e.getUserAddress() : imUser.getUserName())
                                     .createTime(e.getDbCreateTime())
                                     .build();
                         }
@@ -167,6 +164,53 @@ public class NeedsService {
             return userInfoRepository.saveOne(userInfo);
         }
         return projectInitedFlag;
+    }
+
+    public List<NeedsApplicationDetailsDto> getNeedsAppList(String projectId) {
+
+        List<ApplicationInfo> applicationInfos = applicationInfoRepo.queryListByProjectId(projectId);
+        if (CollectionUtils.isEmpty(applicationInfos)){
+            return Collections.emptyList();
+        }
+
+        List<InstanceMessage> instanceMessages = instanceMessageRepository.queryByProjectAddress(applicationInfos.get(0).getProjectAddress());
+        List<String> reviewerList = instanceMessages.stream().map(InstanceMessage::getUserAddress).collect(Collectors.toList());
+        List<UserInfo> imUserInfos = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(reviewerList)){
+            imUserInfos.addAll(userInfoRepository.queryByUserWalletList(reviewerList.stream().distinct().collect(Collectors.toList())));
+        }
+
+        return applicationInfos.stream().map(x -> {
+                    List<InstanceMessage> messageList = instanceMessages.stream()
+                            .filter(e -> e.getApplicationId().equals(x.getId()))
+                            .collect(Collectors.toList());
+                    if (CollectionUtils.isEmpty(messageList)){
+                        return null;
+                    }
+                    List<PersonalNeedsDto.MessageDto> messageDtoList =
+                            messageList.stream().map(s -> {
+                                        UserInfo imUser = imUserInfos.stream().filter(y -> s.getUserAddress().equals(y.getUserWallet())).findFirst().orElse(null);
+                                        return PersonalNeedsDto.MessageDto.builder()
+                                                .message(s.getMessage())
+                                                .createTime(s.getDbCreateTime())
+                                                .name(Objects.isNull(imUser) ? s.getUserAddress() : imUser.getUserName())
+                                                .build();
+                                    }
+                            ).collect(Collectors.toList());
+
+                    UserInfo userInfo = imUserInfos.stream().filter(y -> x.getReviewerAddress().equals(y.getUserWallet())).findFirst().orElse(null);
+                    return NeedsApplicationDetailsDto.builder()
+                            .applicationId(String.valueOf(x.getId()))
+                            .messageDtoList(messageDtoList)
+                            .applicationUserAvatar(Objects.isNull(userInfo)?"":userInfo.getAvatar())
+                            .applicationUserName(Objects.isNull(userInfo)?x.getReviewerAddress():userInfo.getUserName())
+                            .applicationStatus(x.getApplicationStatus())
+                            .createTime(x.getDbCreateTime())
+                            .build();
+                    }
+                )
+                .collect(Collectors.toList());
+
     }
 
 //    public List<Object> getRelatedNeeds(){
