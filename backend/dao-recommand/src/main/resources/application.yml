@@ -3,10 +3,14 @@
 # 数据源
 spring:
   datasource:
-    username: root
-    password: 123456
-    url: jdbc:mysql://124.223.105.57:3306/bfit?useUnicode=true&characterEncoding=utf-8
-    driver-class-name: com.mysql.cj.jdbc.Driver
+#    username: root
+#    password: 123456
+#    url: jdbc:mysql://124.223.105.57:3306/bfit?useUnicode=true&characterEncoding=utf-8
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: bd3admin
+    password: ED%gFXN!BA_qP@uo7S
+    url: jdbc:postgresql://ls-77b2c0b75da82d2894ed93435b4a26270b91de81.c7y9o8ohmkhm.us-west-2.rds.amazonaws.com/bd3
+    driver-class-name: org.postgresql.Driver
     hikari:
       # 连接池最大连接数
       maximum-pool-size: 12
@@ -24,6 +28,7 @@ spring:
       max-file-size: 10MB
 server:
   port: 8883
+
 
 logging:
   level:

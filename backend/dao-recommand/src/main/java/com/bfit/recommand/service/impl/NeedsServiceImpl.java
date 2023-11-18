@@ -3,8 +3,16 @@ package com.bfit.recommand.service.impl;
 import com.bfit.recommand.common.ApplicationStatusEnum;
 import com.bfit.recommand.common.OrderStatusEnum;
 import com.bfit.recommand.common.util.RandomUtils;
-import com.bfit.recommand.data.entity.*;
-import com.bfit.recommand.repo.*;
+import com.bfit.recommand.data.entity.ApplicationInfo;
+import com.bfit.recommand.data.entity.InstanceMessage;
+import com.bfit.recommand.data.entity.ProjectInfo;
+import com.bfit.recommand.data.entity.UserInfo;
+import com.bfit.recommand.data.entity.UserProject;
+import com.bfit.recommand.repo.ApplicationInfoRepo;
+import com.bfit.recommand.repo.InstanceMessageRepository;
+import com.bfit.recommand.repo.ProjectInfoRepository;
+import com.bfit.recommand.repo.UserInfoRepository;
+import com.bfit.recommand.repo.UserProjectRepository;
 import com.bfit.recommand.service.IApplicationService;
 import com.bfit.recommand.service.INeedsService;
 import com.bfit.recommand.web.dto.HomeNeedsDto;
@@ -12,6 +20,8 @@ import com.bfit.recommand.web.dto.NeedsApplicationDetailsDto;
 import com.bfit.recommand.web.dto.PersonalNeedsDto;
 import com.bfit.recommand.web.dto.request.PublishNeedsRequest;
 import com.bfit.recommand.web.dto.request.UserApplyNeedsRequest;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -32,7 +42,7 @@ import static com.bfit.recommand.common.RelationTypeEnum.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NeedsServiceImpl implements INeedsService {
+public class NeedsServiceImpl {
 
     private final ProjectInfoRepository projectInfoRepository;
     private final UserInfoRepository userInfoRepository;
