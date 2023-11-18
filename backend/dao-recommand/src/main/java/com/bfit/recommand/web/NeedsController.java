@@ -1,11 +1,12 @@
 package com.bfit.recommand.web;
 
 import com.bfit.recommand.common.dto.CommonResult;
-import com.bfit.recommand.service.NeedsService;
+import com.bfit.recommand.service.impl.NeedsServiceImpl;
 import com.bfit.recommand.web.dto.HomeNeedsDto;
 import com.bfit.recommand.web.dto.NeedsApplicationDetailsDto;
 import com.bfit.recommand.web.dto.PersonalNeedsDto;
 import com.bfit.recommand.web.dto.request.PublishNeedsRequest;
+import com.bfit.recommand.web.dto.request.UserApplyNeedsRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +30,7 @@ public class NeedsController {
      * /api/complete_needs
      * /api/confirm_needs
      */
-    private final NeedsService needsService;
+    private final NeedsServiceImpl needsService;
 
 
     @CrossOrigin
@@ -70,20 +71,20 @@ public class NeedsController {
 
     @CrossOrigin
     @PostMapping("/join_needs")
-    public CommonResult<Boolean> joinNeeds(){
-        return CommonResult.ok(true);
+    public CommonResult<Boolean> joinNeeds(@RequestBody @Validated UserApplyNeedsRequest request){
+        return CommonResult.ok(needsService.joinNeeds(request));
     }
 
     @CrossOrigin
     @PostMapping("/accept_needs")
-    public CommonResult<Boolean> acceptNeeds(){
-        return CommonResult.ok(true);
+    public CommonResult<Boolean> acceptNeeds(@RequestBody @Validated UserApplyNeedsRequest request){
+        return CommonResult.ok(needsService.acceptNeeds(request));
     }
 
     @CrossOrigin
     @PostMapping("/reject_needs")
-    public CommonResult<Boolean> rejectNeeds(){
-        return CommonResult.ok(true);
+    public CommonResult<Boolean> rejectNeeds(@RequestBody @Validated UserApplyNeedsRequest request){
+        return CommonResult.ok(needsService.rejectNeeds(request));
     }
 
     @CrossOrigin

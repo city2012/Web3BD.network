@@ -1,36 +1,45 @@
-package com.bfit.recommand.service;
+package com.bfit.recommand.service.impl;
 
+import com.bfit.recommand.common.ApplicationStatusEnum;
 import com.bfit.recommand.common.OrderStatusEnum;
 import com.bfit.recommand.common.util.RandomUtils;
-import com.bfit.recommand.common.util.SnowflakeIdGenerator;
 import com.bfit.recommand.data.entity.*;
 import com.bfit.recommand.repo.*;
+import com.bfit.recommand.service.IApplicationService;
+import com.bfit.recommand.service.INeedsService;
 import com.bfit.recommand.web.dto.HomeNeedsDto;
 import com.bfit.recommand.web.dto.NeedsApplicationDetailsDto;
 import com.bfit.recommand.web.dto.PersonalNeedsDto;
 import com.bfit.recommand.web.dto.request.PublishNeedsRequest;
+import com.bfit.recommand.web.dto.request.UserApplyNeedsRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.bfit.recommand.common.RelationTypeEnum.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NeedsService {
+public class NeedsServiceImpl implements INeedsService {
 
     private final ProjectInfoRepository projectInfoRepository;
     private final UserInfoRepository userInfoRepository;
     private final UserProjectRepository userProjectRepository;
     private final InstanceMessageRepository instanceMessageRepository;
     private final ApplicationInfoRepo applicationInfoRepo;
+    private final IApplicationService applicationServiceImpl;
 
     public List<HomeNeedsDto> getPublicNeeds(){
 
@@ -168,7 +177,10 @@ public class NeedsService {
 
     public List<NeedsApplicationDetailsDto> getNeedsAppList(String projectId) {
 
-        List<ApplicationInfo> applicationInfos = applicationInfoRepo.queryListByProjectId(projectId);
+        if (StringUtils.isBlank(projectId)){
+            return Collections.emptyList();
+        }
+        List<ApplicationInfo> applicationInfos = applicationInfoRepo.queryListByProjectId(Long.parseLong(projectId));
         if (CollectionUtils.isEmpty(applicationInfos)){
             return Collections.emptyList();
         }
@@ -217,30 +229,68 @@ public class NeedsService {
 //
 //        return CommonResult.ok();
 //    }
-//
-//    public Boolean joinNeeds(){
-//        return CommonResult.ok(true);
-//    }
-//
-//    public Boolean acceptNeeds(){
-//        return CommonResult.ok(true);
-//    }
-//
-//    public Boolean rejectNeeds(){
-//        return CommonResult.ok(true);
-//    }
-//
+
+    public Boolean joinNeeds(UserApplyNeedsRequest request){
+
+        ProjectInfo projectInfo = projectInfoRepository.queryByProjectId(request.getProjectId());
+        if (Objects.isNull(projectInfo) || OrderStatusEnum.checkUnApplicableStatus(projectInfo.getProjectStatus())){
+            return false;
+        }
+        List<ApplicationInfo> applicationInfos = applicationInfoRepo.queryListByProjectId(request.getProjectId());
+        if (CollectionUtils.isNotEmpty(applicationInfos)
+                && applicationInfos.stream().anyMatch(x -> x.getApplicationStatus().equals(ApplicationStatusEnum.ACCEPTED.getCode()))){
+            throw new RuntimeException("Project is Already in process, You cannot apply now.");
+        }
+
+        return applicationServiceImpl.joinApplication(request.getProjectId(), request.getWalletAddress(), request.getProjectAddress());
+    }
+
+    public Boolean acceptNeeds(UserApplyNeedsRequest request){
+
+        ProjectInfo projectInfo = projectInfoRepository.queryByProjectId(request.getProjectId());
+        if (Objects.isNull(projectInfo) || OrderStatusEnum.checkUnApplicableStatus(projectInfo.getProjectStatus())){
+            return false;
+        }
+
+        projectInfo.setProjectStatus(OrderStatusEnum.ACCEPTED.getCode());
+
+        if (!applicationServiceImpl.acceptApplication(request.getProjectId(), request.getWalletAddress(), request.getProjectAddress())){
+            return false;
+        }
+        return projectInfoRepository.updateById(projectInfo);
+    }
+
+    public Boolean rejectNeeds(UserApplyNeedsRequest request){
+
+        ProjectInfo projectInfo = projectInfoRepository.queryByProjectId(request.getProjectId());
+        if (Objects.isNull(projectInfo) || OrderStatusEnum.checkUnApplicableStatus(projectInfo.getProjectStatus())){
+            return false;
+        }
+
+        return applicationServiceImpl.rejectApplication(request.getProjectId(), request.getWalletAddress(), request.getProjectAddress());
+    }
+
 //    public Boolean stopNeeds(){
 //        return CommonResult.ok(true);
 //    }
 //
-//    public Boolean completeNeeds(){
-//        return CommonResult.ok(true);
-//    }
-//
-//    public Boolean finalConfirmNeeds(){
-//        return CommonResult.ok(true);
-//    }
+    public Boolean completeNeeds(UserApplyNeedsRequest request){
+        ProjectInfo projectInfo = projectInfoRepository.queryByProjectId(request.getProjectId());
+        if (Objects.isNull(projectInfo) || !OrderStatusEnum.PROCESSING.getCode().equals(projectInfo.getProjectStatus())){
+            return false;
+        }
+        projectInfo.setProjectStatus(OrderStatusEnum.COMPLETED.getCode());
+        return projectInfoRepository.updateById(projectInfo);
+    }
+
+    public Boolean finalConfirmNeeds(UserApplyNeedsRequest request){
+        ProjectInfo projectInfo = projectInfoRepository.queryByProjectId(request.getProjectId());
+        if (Objects.isNull(projectInfo) || !OrderStatusEnum.COMPLETED.getCode().equals(projectInfo.getProjectStatus())){
+            return false;
+        }
+        projectInfo.setProjectStatus(OrderStatusEnum.FINAL_CONFIRMED.getCode());
+        return projectInfoRepository.updateById(projectInfo);
+    }
 
 
 

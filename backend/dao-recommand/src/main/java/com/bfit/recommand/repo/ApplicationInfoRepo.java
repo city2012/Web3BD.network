@@ -31,15 +31,34 @@ public class ApplicationInfoRepo {
     }
 
 
-    public List<ApplicationInfo> queryListByProjectId(String projectId) {
+    public List<ApplicationInfo> queryListByProjectId(Long projectId) {
 
-        if (StringUtils.isBlank(projectId)){
+        if (Objects.isNull(projectId)){
             return Collections.emptyList();
         }
 
         return new LambdaQueryChainWrapper<>(applicationInfoMapper)
-                .in(ApplicationInfo::getProjectId, Long.parseLong(projectId.trim()))
+                .in(ApplicationInfo::getProjectId, projectId)
                 .list();
 
     }
+
+    public Boolean saveOne(ApplicationInfo entity){
+
+        if (Objects.isNull(entity)){
+            return false;
+        }
+
+        return applicationInfoMapper.insert(entity) > 0;
+    }
+
+    public Boolean updateById(ApplicationInfo entity){
+
+        if (Objects.isNull(entity)){
+            return false;
+        }
+
+        return applicationInfoMapper.updateById(entity) > 0;
+    }
+
 }

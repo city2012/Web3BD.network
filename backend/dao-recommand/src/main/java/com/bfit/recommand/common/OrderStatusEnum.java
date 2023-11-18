@@ -3,6 +3,10 @@ package com.bfit.recommand.common;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Getter
 @AllArgsConstructor
 public enum OrderStatusEnum {
@@ -18,6 +22,12 @@ public enum OrderStatusEnum {
     ;
     Integer code;
     String status;
+
+    public static boolean checkUnApplicableStatus(Integer status){
+        return Arrays.asList(ACCEPTED,PROCESSING,COMPLETED,FINAL_CONFIRMED).contains(status)
+                || !Arrays.stream(values()).map(OrderStatusEnum::getCode).collect(Collectors.toList()).contains(status);
+
+    }
 
 
 }

@@ -27,6 +27,12 @@ public class ProjectInfoRepository {
                 .last("limit 1").one();
     }
 
+    public ProjectInfo queryByProjectId(Long projectId){
+        return new LambdaQueryChainWrapper<>(projectInfoMapper)
+                .eq(ProjectInfo::getId, projectId)
+                .last("limit 1").one();
+    }
+
     public List<ProjectInfo> queryRecentListExcludeIssuer(String issuerAddress){
         return new LambdaQueryChainWrapper<>(projectInfoMapper)
                 .ne(ProjectInfo::getIssuerAddress, issuerAddress)
@@ -60,6 +66,11 @@ public class ProjectInfoRepository {
         return projectInfoMapper.insert(entity) > 0;
     }
 
-
+    public boolean updateById(ProjectInfo entity){
+        if (Objects.isNull(entity)){
+            return false;
+        }
+        return projectInfoMapper.updateById(entity) > 0;
+    }
 
 }
