@@ -38,7 +38,7 @@ public class ApplicationInfoRepo {
         }
 
         return new LambdaQueryChainWrapper<>(applicationInfoMapper)
-                .in(ApplicationInfo::getProjectId, projectId)
+                .eq(ApplicationInfo::getProjectId, projectId)
                 .list();
 
     }
