@@ -90,22 +90,22 @@ public class NeedsController {
         return CommonResult.ok(needsService.rejectNeeds(request));
     }
 
-    @CrossOrigin
-    @PostMapping("/stop_needs")
-    public CommonResult<Boolean> stopNeeds(){
-        return CommonResult.ok(true);
-    }
+//    @CrossOrigin
+//    @PostMapping("/stop_needs")
+//    public CommonResult<Boolean> stopNeeds(){
+//        return CommonResult.ok(true);
+//    }
 
     @CrossOrigin
     @PostMapping("/complete_needs")
-    public CommonResult<Boolean> completeNeeds(){
-        return CommonResult.ok(true);
+    public CommonResult<Boolean> completeNeeds(@RequestBody @Validated UserApplyNeedsRequest request){
+        return CommonResult.ok(needsService.completeNeeds(request));
     }
 
     @CrossOrigin
     @PostMapping("/confirm_needs")
-    public CommonResult<Boolean> finalConfirmNeeds(){
-        return CommonResult.ok(true);
+    public CommonResult<Boolean> finalConfirmNeeds(@RequestBody @Validated UserApplyNeedsRequest request){
+        return CommonResult.ok(needsService.finalConfirmNeeds(request));
     }
 
 }
