@@ -27,6 +27,7 @@ public class UserRegisterRequest {
     private String twitter;
     private String userEmail;
     private String other;
+    // confirm the reality of the input sheet
     private Boolean checkbox;
     private Boolean personFlag;
     private String userWallet;

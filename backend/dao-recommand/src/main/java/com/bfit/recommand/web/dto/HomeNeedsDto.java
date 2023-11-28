@@ -14,6 +14,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class HomeNeedsDto {
 
+    private String projectId;
     private BigDecimal reward;
     private String crypto;
     private String avatar;

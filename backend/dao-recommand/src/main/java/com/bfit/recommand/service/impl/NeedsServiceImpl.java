@@ -2,6 +2,7 @@ package com.bfit.recommand.service.impl;
 
 import com.bfit.recommand.common.ApplicationStatusEnum;
 import com.bfit.recommand.common.OrderStatusEnum;
+import com.bfit.recommand.common.RelationTypeEnum;
 import com.bfit.recommand.common.util.RandomUtils;
 import com.bfit.recommand.data.entity.ApplicationInfo;
 import com.bfit.recommand.data.entity.InstanceMessage;
@@ -67,6 +68,7 @@ public class NeedsServiceImpl {
             }
 
             return HomeNeedsDto.builder()
+                    .projectId(String.valueOf(x.getId()))
                     .crypto(x.getProjectAsset())
                     .reward(x.getProjectPrice())
                     .needsName(x.getProjectName())
@@ -98,13 +100,18 @@ public class NeedsServiceImpl {
         }
 
         return projectInfoList.stream().map(x -> {
-
-            UserInfo userInfo = userInfos.stream().filter(e -> e.getUserWallet().equals(x.getIssuerAddress())).findFirst().orElse(null);
+            UserInfo userInfo = null;
+            if (RelationTypeEnum.POST.equals(fetchByCode(relationType))){
+                userInfo = userInfos.stream().filter(e -> e.getUserWallet().equals(x.getIssuerAddress())).findFirst().orElse(null);
+            }else {
+                userInfo = userInfos.get(0);
+            }
             if (Objects.isNull(userInfo)){
                 return null;
             }
 
             return PersonalNeedsDto.builder().needsName(x.getProjectName())
+                    .projectId(String.valueOf(x.getId()))
                     .avatar(userInfo.getAvatar())
                     .organizationName(userInfo.getUserName())
                     .description(x.getDescription())
@@ -202,12 +209,14 @@ public class NeedsServiceImpl {
             imUserInfos.addAll(userInfoRepository.queryByUserWalletList(reviewerList.stream().distinct().collect(Collectors.toList())));
         }
 
-        return applicationInfos.stream().map(x -> {
+
+        List<NeedsApplicationDetailsDto> resultList = new ArrayList<>();
+        applicationInfos.forEach(x -> {
                     List<InstanceMessage> messageList = instanceMessages.stream()
                             .filter(e -> e.getApplicationId().equals(x.getId()))
                             .collect(Collectors.toList());
                     if (CollectionUtils.isEmpty(messageList)){
-                        return null;
+                        return;
                     }
                     List<PersonalNeedsDto.MessageDto> messageDtoList =
                             messageList.stream().map(s -> {
@@ -221,18 +230,17 @@ public class NeedsServiceImpl {
                             ).collect(Collectors.toList());
 
                     UserInfo userInfo = imUserInfos.stream().filter(y -> x.getReviewerAddress().equals(y.getUserWallet())).findFirst().orElse(null);
-                    return NeedsApplicationDetailsDto.builder()
+                    resultList.add(NeedsApplicationDetailsDto.builder()
                             .applicationId(String.valueOf(x.getId()))
                             .messageDtoList(messageDtoList)
                             .applicationUserAvatar(Objects.isNull(userInfo)?"":userInfo.getAvatar())
                             .applicationUserName(Objects.isNull(userInfo)?x.getReviewerAddress():userInfo.getUserName())
                             .applicationStatus(x.getApplicationStatus())
                             .createTime(x.getDbCreateTime())
-                            .build();
+                            .build());
                     }
-                )
-                .collect(Collectors.toList());
-
+                );
+        return resultList;
     }
 
 //    public List<Object> getRelatedNeeds(){

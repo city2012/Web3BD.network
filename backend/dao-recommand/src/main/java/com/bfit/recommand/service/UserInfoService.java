@@ -7,7 +7,6 @@ import com.bfit.recommand.data.entity.UserInfo;
 import com.bfit.recommand.repo.UserInfoRepository;
 import com.bfit.recommand.web.dto.UserInfoDto;
 import com.bfit.recommand.web.dto.request.UserRegisterRequest;
-import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -17,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -46,14 +46,14 @@ public class UserInfoService {
                 .userEmail(userInfo.getUserEmail())
                 .userName(userInfo.getUserName())
                 .avatar(userInfo.getAvatar())
-                .socialLinkList(JsonUtils.toList(userInfo.getSocialLinks(), new TypeReference<>() {}))
+                .socialLinkList(JsonUtils.toObjList(userInfo.getSocialLinks(), UserInfo.SocialLinkDto.class))
                 .build();
     }
 
     public Boolean register(UserRegisterRequest request){
         Date date = new Date();
 
-        if (!request.getCheckbox()){
+        if (Objects.nonNull(request.getCheckbox()) && !request.getCheckbox()){
             return false;
         }
 
@@ -61,7 +61,7 @@ public class UserInfoService {
                 .userEmail(request.getUserEmail())
                 .userWallet(request.getUserWallet())
                 .avatar(request.getAvatar())
-                .socialLinks(JsonUtils.toStringWithNullKey(
+                .socialLinks(JsonUtils.toJsonHasNullKey(
                                 UserInfo.SocialLinkDto.builder()
                                         .name("twitter")
                                         .link(request.getTwitter())
@@ -73,7 +73,7 @@ public class UserInfoService {
                 .dbCreateTime(date)
                 .build();
 
-        if (request.getPersonFlag()){
+        if (Objects.nonNull(request.getPersonFlag()) && request.getPersonFlag()){
             String orgId = request.getOrgId();
             if (StringUtils.isNotBlank(orgId) && StringUtils.isNotBlank(orgId.trim())){
                 userInfo.setOrganizationId(Long.parseLong(orgId.trim()));
@@ -100,7 +100,7 @@ public class UserInfoService {
                     .userName(x.getUserName())
                     .avatar(x.getAvatar())
                     .userWallet(x.getUserWallet())
-                    .socialLinkList(JsonUtils.toList(x.getSocialLinks(), new TypeReference<List<UserInfo.SocialLinkDto>>() {}))
+                    .socialLinkList(JsonUtils.toObjList(x.getSocialLinks(), UserInfo.SocialLinkDto.class))
                     .build();
         }).collect(Collectors.toList());
     }
