@@ -20,5 +20,6 @@ public class UserInfoDto {
     private String userEmail;
     private List<UserInfo.SocialLinkDto> socialLinkList;
     private Integer noticeNum;
+    private String desc;
 
 }

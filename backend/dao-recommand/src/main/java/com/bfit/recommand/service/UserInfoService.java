@@ -46,6 +46,7 @@ public class UserInfoService {
                 .userEmail(userInfo.getUserEmail())
                 .userName(userInfo.getUserName())
                 .avatar(userInfo.getAvatar())
+                .desc(userInfo.getDescription())
                 .socialLinkList(JsonUtils.toObjList(userInfo.getSocialLinks(), UserInfo.SocialLinkDto.class))
                 .build();
     }
