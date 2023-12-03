@@ -260,7 +260,16 @@ public class NeedsServiceImpl {
             throw new RuntimeException("Project is Already in process, You cannot apply now.");
         }
 
-        return applicationServiceImpl.joinApplication(request.getProjectId(), request.getWalletAddress(), request.getProjectAddress());
+        UserProject userProject = UserProject.builder()
+                .projectAddress(projectInfo.getProjectAddress())
+                .issuerAddress(projectInfo.getIssuerAddress())
+                .reviewerAddress(request.getWalletAddress())
+                .build();
+
+        if (userProjectRepository.insertBatch(Collections.singletonList(userProject))){
+            return applicationServiceImpl.joinApplication(request.getProjectId(), request.getWalletAddress(), request.getProjectAddress());
+        }
+        return false;
     }
 
     public Boolean acceptNeeds(UserApplyNeedsRequest request){
