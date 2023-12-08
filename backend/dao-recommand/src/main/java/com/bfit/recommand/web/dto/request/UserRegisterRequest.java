@@ -20,7 +20,7 @@ public class UserRegisterRequest {
      *     other: '',
      *     checkbox: false,
      */
-    private String avatar;
+    private String logo;
     private String userName;
     private String description;
     private String website;

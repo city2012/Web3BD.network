@@ -59,13 +59,14 @@ public class UserInfoService {
         }
 
         UserInfo userInfo = UserInfo.builder()
+                .userName(request.getUserName())
                 .userEmail(request.getUserEmail())
                 .userWallet(request.getUserWallet())
-                .avatar(request.getAvatar())
+                .avatar(request.getLogo())
                 .socialLinks(JsonUtils.toJsonHasNullKey(
                                 UserInfo.SocialLinkDto.builder()
                                         .name("twitter")
-                                        .link(request.getTwitter())
+                                        .link(request.getWebsite())
                                         .build()
                         )
                 )
