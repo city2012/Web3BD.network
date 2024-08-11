@@ -99,7 +99,7 @@ public class JsonUtils {
 
     private static <T> T newInstance(Class<T> objClass) {
         try {
-            return objClass.newInstance();
+            return objClass.getDeclaredConstructor().newInstance();
         } catch (Exception e) {
             LOGGER.error("failed to create new instance", e);
             throw new RuntimeException("cannot create new instance", e);
@@ -113,7 +113,7 @@ public class JsonUtils {
 
         try {
             return MAPPER.readValue(jsonStr,
-                    MAPPER.getTypeFactory().constructParametrizedType(ArrayList.class, List.class, objClass));
+                    MAPPER.getTypeFactory().constructParametricType(ArrayList.class, List.class, objClass));
         } catch (IOException e) {
             LOGGER.error("JsonUtils transformation string to objList has Eroor!", e);
         }

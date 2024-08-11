@@ -17,7 +17,7 @@ public class CustomOkHttpUtils {
         builder.connectTimeout(10, TimeUnit.SECONDS);
         builder.readTimeout(10, TimeUnit.SECONDS);
         builder.writeTimeout(10, TimeUnit.SECONDS);
-//        builder.connectionPool(connectionPool);
+        builder.connectionPool(connectionPool); // 取消注释此行
         builder.addInterceptor(new LoggingInterceptor());
         client = builder
                 .build();

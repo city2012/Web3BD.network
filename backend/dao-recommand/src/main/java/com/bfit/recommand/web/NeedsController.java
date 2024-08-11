@@ -1,7 +1,6 @@
 package com.bfit.recommand.web;
 
 import com.bfit.recommand.common.dto.CommonResult;
-import com.bfit.recommand.service.INeedsService;
 import com.bfit.recommand.service.impl.NeedsServiceImpl;
 import com.bfit.recommand.web.dto.HomeNeedsDto;
 import com.bfit.recommand.web.dto.NeedsApplicationDetailsDto;
@@ -9,7 +8,6 @@ import com.bfit.recommand.web.dto.PersonalNeedsDto;
 import com.bfit.recommand.web.dto.request.PublishNeedsRequest;
 import com.bfit.recommand.web.dto.request.UserApplyNeedsRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 

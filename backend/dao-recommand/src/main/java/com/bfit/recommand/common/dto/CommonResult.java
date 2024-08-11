@@ -14,12 +14,12 @@ public class CommonResult<T> implements Serializable {
     private String errMsg;
     private T data;
 
-    public static CommonResult ok(){
-        return CommonResult.builder().code(HttpStatus.OK.value()).build();
+    public static <T> CommonResult<T> ok() {
+        return CommonResult.<T>builder().code(HttpStatus.OK.value()).build();
     }
 
-    public static <T>CommonResult ok(T t){
-        return CommonResult.builder().code(HttpStatus.OK.value()).data(t).build();
+    public static <T> CommonResult<T> ok(T t) {
+        return CommonResult.<T>builder().code(HttpStatus.OK.value()).data(t).build();
     }
 
 }
