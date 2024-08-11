@@ -43,7 +43,7 @@ public class RecommendService {
         }
 
         if (null == projectInfos || projectInfos.isEmpty()){
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
         List<String> projectAddressList = projectInfos.stream().map(ProjectInfo::getProjectAddress).collect(Collectors.toList());
